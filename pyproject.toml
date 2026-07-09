@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hinlegacy"
+version = "0.1.0"
+description = "Detect and decode legacy Hindi font encodings like Walkman Chanakya, KrutiDev 010, and DevLys 010 into Unicode Devanagari."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "Your Name", email = "you@example.com" }
+]
+keywords = ["hindi", "unicode", "legacy-font", "krutidev", "chanakya", "devlys"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Text Processing"
+]
+
+[project.scripts]
+hinlegacy = "hinlegacy.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

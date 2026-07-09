@@ -4,7 +4,7 @@ import re
 def krutidev_to_unicode(src: str) -> str:
     """
     Convert text in KrutiDev / Walkman Chanakya 905 legacy encoding to Unicode Devanagari.
-    Ported from the public Walkman Chanakya905 converter. [web:5]
+    Ported from the public Walkman Chanakya905 converter.
     """
     if not src:
         return ""
@@ -209,7 +209,7 @@ def walkman_chanakya905_to_unicode(src: str) -> str:
     """
     Walkman-Chanakya905Normal (Type1, WinAnsiEncoding) -> Unicode Devanagari.
     This matches the way the public Walkman Chanakya905 converter treats
-    Chanakya/Walkman glyphs: first remap a few glyphs, then use KrutiDev mapping. [web:5]
+    Chanakya/Walkman glyphs: first remap a few glyphs, then use KrutiDev mapping.
     """
     if not src:
         return ""
