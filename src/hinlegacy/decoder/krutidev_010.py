@@ -2,7 +2,7 @@
 KrutiDev 010 decoder.
 """
 
-from krutidev import krutidev_to_unicode
+from hinlegacy.decoder.engines.krutidev import krutidev_to_unicode
 
 FONT_SLUG = "krutidev_010"
 DISPLAY_NAME = "KrutiDev 010"

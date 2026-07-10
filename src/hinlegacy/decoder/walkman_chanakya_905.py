@@ -2,7 +2,7 @@
 Walkman Chanakya 905 decoder.
 """
 
-from chanakya import chanakya_to_unicode
+from hinlegacy.decoder.engines.chanakya import chanakya_to_unicode
 
 FONT_SLUG = "walkman_chanakya_905"
 DISPLAY_NAME = "Walkman Chanakya 905"
@@ -13,6 +13,7 @@ ALIASES = (
     "walkman_chanakya_905",
     "walkman-chanakya905",
     "walkman-chanakya-905",
+    "walkman"
 )
 
 def decode(text: str) -> str:

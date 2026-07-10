@@ -2,7 +2,7 @@
 DevLys 010 decoder.
 """
 
-from devlys import devlys_to_unicode
+from hinlegacy.decoder.engines.devlys import devlys_to_unicode
 
 FONT_SLUG = "devlys_010"
 DISPLAY_NAME = "DevLys 010"
