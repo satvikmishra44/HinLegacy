@@ -2,7 +2,7 @@
 Walkman Chanakya 905 decoder.
 """
 
-from hinlegacy.decoder.engines.chanakya import chanakya_to_unicode
+from hinlegacy.decoder.engines.chanakya import chanakya_to_unicode, unicode_to_chanakya
 
 FONT_SLUG = "walkman_chanakya_905"
 DISPLAY_NAME = "Walkman Chanakya 905"
@@ -18,3 +18,6 @@ ALIASES = (
 
 def decode(text: str) -> str:
     return chanakya_to_unicode(text)
+
+def encode(text: str) -> str:
+    return unicode_to_chanakya(text)

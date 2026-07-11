@@ -42,6 +42,43 @@ def chanakya_to_unicode(text, chunk_size=6000):
         result.append(replace_symbols(text[i:i + chunk_size]))
     return ''.join(result)
 
+# Reverse table
+REVERSE_PAIRS = sorted(
+    [(u, c) for c, u in PAIRS],
+    key=lambda x: len(x[0]),
+    reverse=True
+)
+
+
+def unicode_to_chanakya(text):
+    if not text:
+        return text
+
+    text = re.sub(
+        r'र्([कखगघचछजझञटठडड़ढढ़णतथदधनपफबभमयरलळवशषसहक्षज्ञ])([ािीुूृेैोौंँ]*)',
+        r'\1\2Z',
+        text
+    )
+
+    text = text.replace("िं", "Ż")
+
+    text = re.sub(
+        r'([कखगघङचछजझञटठडड़ढढ़णतथदधनपफबभमयरलवशषसहक्षज्ञ])ि',
+        r'f\1',
+        text
+    )
+
+    text = re.sub(
+        r'([्])([कखगघङचछजझञटठडड़ढढ़णतथदधनपफबभमयरलवशषसहक्षज्ञ])ि',
+        r'f\1\2',
+        text
+    )
+
+    text = text.replace("Ż", "fं")
+    for uni, ch in REVERSE_PAIRS:
+        text = text.replace(uni, ch)
+
+    return text
 
 if __name__ == '__main__':
     text = input("Enter Chanakya Text:")

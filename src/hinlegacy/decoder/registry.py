@@ -1,21 +1,50 @@
 """
-Registry mapping font slugs/aliases to decoder functions.
+Registry mapping font slugs/aliases to encoder/decoder functions.
 """
 
 from collections.abc import Callable
+from dataclasses import dataclass
 
-DECODER_REGISTRY: dict[str, Callable[[str], str]] = {}
+from hinlegacy.exceptions import UnknownFontError
 
 
-def register_decoder(slug: str, aliases: tuple[str, ...], decode_fn: Callable[[str], str]) -> None:
+TextTransform = Callable[[str], str]
+
+
+@dataclass(frozen=True)
+class CodecEntry:
+    slug: str
+    decode: TextTransform
+    encode: TextTransform
+
+
+DECODER_REGISTRY: dict[str, CodecEntry] = {}
+
+
+def _normalize_font_key(font: str) -> str:
+    return font.strip().lower().replace("-", "_")
+
+
+def register_codec(
+    slug: str,
+    aliases: tuple[str, ...],
+    decode_fn: TextTransform,
+    encode_fn: TextTransform,
+) -> None:
+    entry = CodecEntry(
+        slug=slug,
+        decode=decode_fn,
+        encode=encode_fn,
+    )
+
     keys = (slug, *aliases)
     for key in keys:
-        normalized = key.strip().lower().replace("-", "_")
-        DECODER_REGISTRY[normalized] = decode_fn
+        normalized = _normalize_font_key(key)
+        DECODER_REGISTRY[normalized] = entry
 
-def resolve_decoder(font: str) -> Callable[[str], str]:
-    normalized = font.strip().lower().replace("-", "_")
+
+def resolve_codec(font: str) -> CodecEntry:
+    normalized = _normalize_font_key(font)
     if normalized not in DECODER_REGISTRY:
-        available = ", ".join(sorted(DECODER_REGISTRY))
-        raise KeyError(f"Unknown font: {font}. Available fonts/aliases: {available}")
+        raise UnknownFontError(f"Unknown font: {font}")
     return DECODER_REGISTRY[normalized]
