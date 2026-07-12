@@ -2,52 +2,54 @@
 Heuristic scoring utilities for font detection.
 """
 
-from collections import Counter
+from __future__ import annotations
+
 from dataclasses import dataclass
 
-from hinlegacy.detector.patterns import FONT_PATTERNS
+from hinlegacy.detector.patterns import FONT_PATTERNS, FONT_UNIQUE_TOKENS
 
 
-@dataclass
+@dataclass(frozen=True)
 class FontScore:
     font_slug: str
     score: float
     strong_hits: int
     medium_hits: int
-    total_chars: int
+    unique_hits: int
+    text_length: int
 
 
-def _count_matching_chars(text: str, charset: set[str]) -> int:
-    return sum(1 for ch in text if ch in charset)
+def _count_token_occurrences(text: str, token: str) -> int:
+    if not token:
+        return 0
+    return text.count(token)
 
 
-def _normalized_score(strong_hits: int, medium_hits: int, total_chars: int) -> float:
-    if total_chars == 0:
-        return 0.0
-    raw = (strong_hits * 2.0) + (medium_hits * 1.0)
-    return raw / total_chars
+def _score_font(text: str, font_slug: str) -> FontScore:
+    pattern_group = FONT_PATTERNS[font_slug]
+    strong_tokens = pattern_group["strong_tokens"]
+    medium_tokens = pattern_group["medium_tokens"]
+    unique_tokens = FONT_UNIQUE_TOKENS.get(font_slug, ())
+
+    strong_hits = sum(_count_token_occurrences(text, token) for token in strong_tokens)
+    medium_hits = sum(_count_token_occurrences(text, token) for token in medium_tokens)
+    unique_hits = sum(_count_token_occurrences(text, token) for token in unique_tokens)
+
+    raw_score = (strong_hits * 3.0) + (medium_hits * 1.0) + (unique_hits * 5.0)
+    normalized = raw_score / max(len(text), 1)
+
+    return FontScore(
+        font_slug=font_slug,
+        score=normalized,
+        strong_hits=strong_hits,
+        medium_hits=medium_hits,
+        unique_hits=unique_hits,
+        text_length=len(text),
+    )
 
 
 def score_fonts(text: str) -> list[FontScore]:
-    cleaned = text.strip()
-    total_chars = len(cleaned)
-
-    scores: list[FontScore] = []
-    for font_slug, groups in FONT_PATTERNS.items():
-        strong_hits = _count_matching_chars(cleaned, groups["strong"])
-        medium_hits = _count_matching_chars(cleaned, groups["medium"])
-        score = _normalized_score(strong_hits, medium_hits, total_chars)
-
-        scores.append(
-            FontScore(
-                font_slug=font_slug,
-                score=score,
-                strong_hits=strong_hits,
-                medium_hits=medium_hits,
-                total_chars=total_chars,
-            )
-        )
-
+    scores = [_score_font(text, font_slug) for font_slug in FONT_PATTERNS]
     scores.sort(key=lambda item: item.score, reverse=True)
     return scores
 
@@ -55,15 +57,16 @@ def score_fonts(text: str) -> list[FontScore]:
 def confidence_from_scores(scores: list[FontScore]) -> float:
     if not scores:
         return 0.0
+
     if len(scores) == 1:
-        return min(scores[0].score, 1.0)
+        return round(min(scores[0].score, 1.0), 4)
 
-    best = scores[0].score
-    second = scores[1].score
+    best = scores[0]
+    second = scores[1]
 
-    if best <= 0:
+    if best.score <= 0:
         return 0.0
 
-    margin = best - second
-    confidence = min(best + margin, 1.0)
-    return round(confidence, 4)
+    margin = best.score - second.score
+    confidence = best.score + (margin * 2.0) + (best.unique_hits * 0.08)
+    return round(min(confidence, 1.0), 4)
