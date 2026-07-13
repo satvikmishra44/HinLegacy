@@ -2,7 +2,7 @@
 Registers all supported font codecs.
 """
 
-from hinlegacy.decoder.registry import register_codec
+from hinlegacy.decoder.registry import register_codec, DECODER_REGISTRY
 
 from hinlegacy.decoder.devlys_010 import (
     FONT_SLUG as DEVLYS_SLUG,
@@ -25,6 +25,10 @@ from hinlegacy.decoder.walkman_chanakya_905 import (
 
 
 def register_all_codecs() -> None:
+
+    if DECODER_REGISTRY:
+        return
+
     register_codec(
         slug=DEVLYS_SLUG,
         aliases=DEVLYS_ALIASES,

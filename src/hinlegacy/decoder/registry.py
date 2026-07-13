@@ -48,3 +48,11 @@ def resolve_codec(font: str) -> CodecEntry:
     if normalized not in DECODER_REGISTRY:
         raise UnknownFontError(f"Unknown font: {font}")
     return DECODER_REGISTRY[normalized]
+
+    
+def is_supported_font(font: str) -> bool:
+    normalized = _normalize_font_key(font)
+    return normalized in DECODER_REGISTRY
+
+def list_supported_fonts() -> list[str]:
+    return sorted({entry.slug for entry in DECODER_REGISTRY.values()})
