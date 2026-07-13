@@ -2,11 +2,12 @@
 Registry mapping font slugs/aliases to encoder/decoder functions.
 """
 
+from __future__ import annotations
+
 from collections.abc import Callable
 from dataclasses import dataclass
 
 from hinlegacy.exceptions import UnknownFontError
-
 
 TextTransform = Callable[[str], str]
 
@@ -22,7 +23,10 @@ DECODER_REGISTRY: dict[str, CodecEntry] = {}
 
 
 def _normalize_font_key(font: str) -> str:
-    return font.strip().lower().replace("-", "_")
+    normalized = font.strip().lower().replace("-", "_")
+    if not normalized:
+        raise UnknownFontError("Font name cannot be empty.")
+    return normalized
 
 
 def register_codec(
@@ -31,8 +35,10 @@ def register_codec(
     decode_fn: TextTransform,
     encode_fn: TextTransform,
 ) -> None:
+    normalized_slug = _normalize_font_key(slug)
+
     entry = CodecEntry(
-        slug=slug,
+        slug=normalized_slug,
         decode=decode_fn,
         encode=encode_fn,
     )
@@ -45,14 +51,22 @@ def register_codec(
 
 def resolve_codec(font: str) -> CodecEntry:
     normalized = _normalize_font_key(font)
-    if normalized not in DECODER_REGISTRY:
-        raise UnknownFontError(f"Unknown font: {font}")
-    return DECODER_REGISTRY[normalized]
+    try:
+        return DECODER_REGISTRY[normalized]
+    except KeyError as exc:
+        available = ", ".join(list_supported_fonts())
+        raise UnknownFontError(
+            f"Unknown font: {font}. Supported fonts: {available}"
+        ) from exc
 
-    
+
 def is_supported_font(font: str) -> bool:
-    normalized = _normalize_font_key(font)
+    try:
+        normalized = _normalize_font_key(font)
+    except UnknownFontError:
+        return False
     return normalized in DECODER_REGISTRY
+
 
 def list_supported_fonts() -> list[str]:
     return sorted({entry.slug for entry in DECODER_REGISTRY.values()})

@@ -16,4 +16,3 @@ class ConversionResult:
     detected_font: str
     confidence: float
     detection_method: str
-    

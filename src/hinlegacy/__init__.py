@@ -1,17 +1,17 @@
 """
-HinLegacy
-=========
-Detect and decode legacy Hindi font encodings into Unicode Devanagari.
+HinLegacy public package interface.
 """
 
-__version__ = "0.1.0"
+version = 0.5
 
-from .api import convert, detect_and_convert # Unified API for future
-from .models import DetectionResult, ConversionResult # Individual submodules
+from hinlegacy.api import convert, decode, detect, encode
+from hinlegacy.models import ConversionResult, DetectionResult
 
 __all__ = [
+    "detect",
+    "decode",
+    "encode",
     "convert",
-    "detect_and_convert",
     "DetectionResult",
     "ConversionResult",
 ]
