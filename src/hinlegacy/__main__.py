@@ -3,7 +3,6 @@ Allows running the package as:
     python -m hinlegacy
 """
 
-from .cli.main import main
+from hinlegacy.cli import main
 
-if __name__ == "__main__":
-    main()
+raise SystemExit(main())
