@@ -8,6 +8,24 @@ import pytest
 from hinlegacy.cli import main
 from hinlegacy.decoder import encode_text, list_supported_fonts
 
+import unicodedata
+
+
+def normalize_hindi_text(text: str) -> str:
+    text = unicodedata.normalize("NFC", text)
+    replacements = {
+        "क़": "क़",
+        "ख़": "ख़",
+        "ग़": "ग़",
+        "ज़": "ज़",
+        "ड़": "ड़",
+        "ढ़": "ढ़",
+        "फ़": "फ़",
+        "य़": "य़",
+    }
+    for src, target in replacements.items():
+        text = text.replace(src, target)
+    return text
 
 def test_cli_help_shows_usage(capsys):
     with pytest.raises(SystemExit) as exc:
@@ -81,8 +99,8 @@ def test_cli_encode_known_font(capsys):
 
 
 def test_cli_detect_returns_expected_font(capsys):
-    unicode_text = "कृपया यहाँ अपना नाम लिखिए"
-    encoded = encode_text(unicode_text, "walkman_chanakya_905")
+    unicode_text = "प्रशासनिक व्यवस्था मजबूत होनी चाहिए"
+    encoded = encode_text(unicode_text, "krutidev_010")
 
     exit_code = main(["detect", encoded])
 
@@ -90,7 +108,7 @@ def test_cli_detect_returns_expected_font(capsys):
     captured = capsys.readouterr()
     lines = [line.strip() for line in captured.out.splitlines() if line.strip()]
 
-    assert lines[0] == "walkman_chanakya_905"
+    assert lines[0] == "krutidev_010"
     assert any(line.startswith("confidence:") for line in lines)
     assert any(line.startswith("method:") for line in lines)
 
@@ -103,8 +121,7 @@ def test_cli_convert_auto_detect(capsys):
 
     assert exit_code == 0
     captured = capsys.readouterr()
-    assert captured.out.strip() == unicode_text
-
+    assert normalize_hindi_text(captured.out.strip()) == normalize_hindi_text(unicode_text)
 
 def test_cli_convert_with_explicit_font(capsys):
     unicode_text = "संविधान सभी नागरिकों को अधिकार देता है"

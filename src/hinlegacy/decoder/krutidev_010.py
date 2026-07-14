@@ -13,4 +13,4 @@ def decode(text: str) -> str:
     return krutidev_to_unicode(text)
 
 def encode(text: str) -> str:
-    return unicode_to_krutidev
+    return unicode_to_krutidev(text)
