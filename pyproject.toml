@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hinlegacy"
-version = "1.0.0"
+version = "1.0.1"
 description = "Detect, decode, and encode legacy Hindi font encodings like Walkman Chanakya, KrutiDev 010, and DevLys 010 into Unicode Devanagari."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -23,8 +23,6 @@ classifiers = [
   "Operating System :: OS Independent",
   "Topic :: Text Processing",
   "Topic :: Software Development :: Libraries :: Python Modules",
-  "Topic :: Machine Learning",
-  "Topic :: AI RAG"
 ]
 
 [project.urls]
